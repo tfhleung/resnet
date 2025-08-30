@@ -87,7 +87,6 @@ class PokeData():  # for training/testing
 
         img = cv2.imread(pimg) #by default, openCV is BGR but matplotlib is RGB
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # img = torchvision.io.read_image(pimg)
         img = self.transform(img)
         # print('image successfully read')
 
@@ -103,21 +102,21 @@ class PokeData():  # for training/testing
         return self.labels[idx]
 
 #%%
-def genannot(split, path):
+def genannot(split, data_path, output = 'labels'):
     import random
     from os import listdir
     
-    if not os.path.exists(f'./labels/'):
-        os.makedirs(f'./labels/')
+    if not os.path.exists(f'./{output}/'):
+        os.makedirs(f'./{output}/')
 
-    ftrain = open('./labels/train.txt','w')
-    fval = open('./labels/val.txt','w')
-    ftest = open('./labels/test.txt','w')
-    fall = open('./labels/all.txt','w')
+    f = {'train': open(f'./{output}/train.txt','w'),
+         'val': open(f'./{output}/val.txt','w'),
+         'test': open(f'./{output}/test.txt','w'),
+         'all': open(f'./{output}/all.txt','w')}
     newline = '\n'
 
-    for label in listdir(path):
-        imgs = os.listdir(path + f'/{label}')
+    for label in listdir(data_path):
+        imgs = os.listdir(data_path + f'/{label}')
         random.shuffle(imgs)
 
         totalval = int(split[1]*len(imgs))
@@ -125,20 +124,19 @@ def genannot(split, path):
         totaltrain = len(imgs) - totalval - totaltest
 
         for i, img in enumerate(imgs):
-            fall.write(path + f'/{label}/{img}{newline}')
+            f['all'].write(data_path + f'/{label}/{img}{newline}')
             if i < totaltrain:
-                ftrain.write(path + f'/{label}/{img}{newline}')
+                f['train'].write(data_path + f'/{label}/{img}{newline}')
             elif i >= totaltrain and i < (len(imgs)-totaltest):
-                fval.write(path + f'/{label}/{img}{newline}')
+                f['val'].write(data_path + f'/{label}/{img}{newline}')
             else:
-                ftest.write(path + f'/{label}/{img}{newline}')
+                f['test'].write(data_path + f'/{label}/{img}{newline}')
 
-    ftrain.close
-    fval.close
-    ftest.close
-    fall.close
+    for key in f:
+        f[key].close
 
 #%%
 if __name__ == "__main__":
     split = [0.7, 0.15, 0.15] #70% training, 15% validation, 15% test 
     genannot(split, path + '/PokemonData')
+# %%

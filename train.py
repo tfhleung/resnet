@@ -3,6 +3,9 @@ import torch
 import time
 from tqdm import tqdm
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 import data
 import resnet
 
@@ -87,8 +90,58 @@ class Trainer():
                 total_loss += loss.item()  # Returns the value of this tensor as a standard Python number
 
         print(f'Dataset: {set}, Num of Images = {total}, Num of Iterations = {i+1}')
-        print(f'Correct = {correct}, total = {total}, Accuracy = {100. * correct/total:.3f}%')
+        print(f'Correct = {correct}, Total = {total}, Accuracy = {100. * correct/total:.3f}%')
         return (100. * correct / total), total_loss / (i+1.)
+
+    def plot_results(self):
+        import numpy as np
+        acc_np = {'train': np.array(self.accuracy['train']),
+              'val': np.array(self.accuracy['val'])}
+        epoch = np.linspace(1, 1+len(acc_np['train']), len(acc_np['train']))
+
+        plt.subplot(1, 2, 1)
+        plt.title("Model Accuracy")
+        plt.plot(epoch ,acc_np['train'][:,0], label = 'Training Accuracy')
+        plt.plot(epoch ,acc_np['val'][:,0], label = 'Validation Accuracy')
+        plt.ylim([0.,100.])
+        plt.ylabel('Percentage Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(loc='lower right')
+
+        plt.subplot(1, 2, 2)
+        plt.title("Loss")
+        plt.plot(epoch ,acc_np['train'][:,1], label = 'Training Loss')
+        plt.plot(epoch ,acc_np['val'][:,1], label = 'Validation Loss')
+        plt.ylim([0.,10.])
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(loc='lower right')
+
+    def plot_imgs(self, num_imgs, font_size = 6, axis_size = 6, shuffle = False, dpi = 100):
+        import torch.nn.functional as F
+        newline = '\n'
+
+        dataloader = torch.utils.data.DataLoader(self.dataset['test'], num_imgs, shuffle = shuffle, num_workers = self.num_workers)
+        test_imgbatch, test_labelsbatch = next(iter(dataloader))
+
+        outputs = self.model(test_imgbatch.to('cuda'))
+        _, predicted = torch.max(outputs, 1)
+        probability = F.softmax(outputs, dim=1)
+        probability_max, _ = torch.max(probability, dim=1)
+
+        print('Predicted: ', ' '.join(f'{self.dataset['test'].labels[predicted[j]]:5s}' for j in range(num_imgs)))
+        print('Predicted: ', ' '.join(f'{probability_max[j]*100.:2.2f}' for j in range(num_imgs)))
+
+        fig = plt.subplots(1,num_imgs)
+        plt.rcParams.update({'font.size': axis_size, 'figure.dpi': dpi})
+        for i in range(num_imgs):
+            plt.subplot(1, num_imgs, i+1)
+            plt.imshow(test_imgbatch[i].permute(1, 2, 0)) #image format is channel x width x height
+            plt.title(f'Ground Truth = {self.dataset['test'].labels[test_labelsbatch[i]]} {newline}'
+                    f'Predicted = {self.dataset['test'].labels[predicted[i]]} {newline}'
+                    f'Probability = {probability_max[i] * 100.:2.2f}%', fontsize=font_size)
+
+        plt.show()
 
 #%%
 if __name__ == '__main__':
@@ -105,15 +158,26 @@ if __name__ == '__main__':
     poke_detector101 = resnet.ResNet(3, 150, block = resnet.BottleneckBlock, num_layers = [3, 4, 23, 3])
     poke_detector152 = resnet.ResNet(3, 150, block = resnet.BottleneckBlock, num_layers = [3, 8, 36, 3])
 #%%
-    trainer = Trainer(poke_ds, poke_detector50.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
+    trainer = Trainer(poke_ds, poke_detector101.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
     trainer.train()
 
 #%%
     import torchvision
     import torch.nn as nn
 
+    # resnet50 = torchvision.models.resnet50()
     resnet50 = torchvision.models.resnet50(weights='IMAGENET1K_V2')
     resnet50.fc = nn.Linear(resnet50.fc.in_features, 150)
 
-    trainerval = Trainer(poke_ds, resnet50, device = 'cuda', epochs = 5, batch_size = 16, lr = 1.e-3, num_workers = 4, shuffle=True)
+    trainerval = Trainer(poke_ds, resnet50, device = 'cuda', epochs = 1, batch_size = 16, lr = 1.e-3, num_workers = 4, shuffle=True)
     trainerval.train()
+# %%
+    # trainerval.compute_accuracy('val')
+    # trainerval.compute_accuracy('test')
+    # trainerval.compute_accuracy('train')
+    # trainerval.plot_results()
+    trainerval.plot_imgs(8, font_size = 3, axis_size = 2, shuffle = True, dpi = 224*8)
+
+# %%
+    plt.rcParams.keys()
+# %%
