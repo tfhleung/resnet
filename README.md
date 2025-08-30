@@ -18,7 +18,7 @@ The ResNet model is implemented with the resnet.py file and contains class defin
 
 The training module is contained in train.py and and defined using the Trainer class.  It can be instanced with the relevant hyperparameters as:
     
-    trainer = Trainer(poke_ds, poke_detector101.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
+    trainer = Trainer(poke_ds, poke_detector.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
 
 Finally, the training can be initiated by calling the train method by:   
     
