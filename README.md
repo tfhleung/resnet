@@ -25,5 +25,5 @@ Finally, the training can be initiated by calling the train method by:
     trainer.train()
 
 
-Model predictions from ResNet50 using pretrained weights (IMAGENET1K_V2).
+Model predictions from ResNet50 using pretrained weights (IMAGENET1K_V2) are shown below:
 <img width="9515" height="1901" alt="image" src="https://github.com/user-attachments/assets/2aba2003-bace-4999-b92a-162c22ee7857" />
