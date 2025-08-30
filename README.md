@@ -16,7 +16,7 @@ The ResNet model is implemented with the resnet.py file and contains class defin
 
     poke_detector = ResNet(in_channels = 3, num_classes = 150, block = BasicBlock, num_layers = [3, 4, 6, 3])
 
-The training module is contained with train.py and the training schedule is defined using the Trainer class.  It can be instanced with the relevant hyperparameters as:
+The training module is contained with train.py and the training hyperparameters are configured using the Trainer class.  It can be instanced with the relevant hyperparameters as:
     
     trainer = Trainer(poke_ds, poke_detector101.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
 
