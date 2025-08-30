@@ -1,4 +1,4 @@
-**PyTorch Implementation of ResNet**\
+**PyTorch Implementation of ResNet**
 
 This repo consists of an implementation the ResNet model (He et. al 2015) using the PyTorch library.  The model was tested using a dataset of 7000 Pokemon (https://www.kaggle.com/datasets/lantian773030/pokemonclassification).  The model was also verified against the built-in versions of ResNet and behaved comparablely with an accuracy ~75%.  The overally accuracy significantly improved to ~95% when pretrained weights were used suggesting the model accuracy can be significantly improved using a larger dataset.
 
