@@ -12,7 +12,7 @@ This repo consists of data, model and training modules.  The data.py file consis
             'val': data.PokeData('val'),
             'test': data.PokeData('test')}
 
-The ResNet model is implmented with the resnet.py file and contains definitions for the different building blocks.  For example, the model can be instanced by the following:
+The ResNet model is implemented with the resnet.py file and contains class definitions for the different building blocks.  For example, the model can be instanced by the following:
 
     poke_detector = ResNet(in_channels = 3, num_classes = 150, block = BasicBlock, num_layers = [3, 4, 6, 3])
 
