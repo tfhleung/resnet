@@ -12,21 +12,14 @@ This repo consists of data, model and training modules.  The data.py file consis
             'val': data.PokeData('val'),
             'test': data.PokeData('test')}
 
+The ResNet model is implmented with with the resnet.py file and contains definitions for the relevant building blocks.  For example, the ResNet can be instanced by the following:
 
-The ResNet model is implmented with with the resnet.py file and consists of the necessary building blocks.  Finally, the 
+    poke_detector = ResNet(in_channels = 3, num_classes = 150, block = BasicBlock, num_layers = [3, 4, 6, 3])
 
-    poke_ds = {'train': data.PokeData('train'),
-            'val': data.PokeData('val'),
-            'test': data.PokeData('test')}
+The training module is contained with train.py and the training schedule is defined within the Traininer class.  It can be instanced with the following hyperparameters as the following:
     
-    print(poke_ds['train'].__len__())
-    print(poke_ds['val'].__len__())
-    print(poke_ds['test'].__len__())
-
-    poke_detector34 = resnet.ResNet(3, 150, block = resnet.BasicBlock, num_layers = [3, 4, 6, 3])
-    poke_detector50 = resnet.ResNet(3, 150, block = resnet.BottleneckBlock, num_layers = [3, 4, 6, 3])
-    poke_detector101 = resnet.ResNet(3, 150, block = resnet.BottleneckBlock, num_layers = [3, 4, 23, 3])
-    poke_detector152 = resnet.ResNet(3, 150, block = resnet.BottleneckBlock, num_layers = [3, 8, 36, 3])
-#%%
     trainer = Trainer(poke_ds, poke_detector101.to('cuda'), device = 'cuda', epochs = 50, batch_size = 16, lr = 1.e-3, num_workers = 4)
+
+Finally, the training can be initaiated by calling the train method by:   
+    
     trainer.train()
